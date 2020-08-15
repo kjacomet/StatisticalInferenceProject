@@ -1,0 +1,89 @@
+---
+title: "Statistical Inference Part 2"
+author: "Kris Jacomet"
+date: "8/14/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+Load Libraries
+
+```{r}
+        library(ggplot2)
+        library(dplyr)
+        library(datasets)
+
+```
+
+1. Loading Data & Exploratory Analyses
+
+```{r}
+        data(ToothGrowth)
+        dim(ToothGrowth)
+        str(ToothGrowth)
+        aggregate(ToothGrowth$len,list(ToothGrowth$supp,ToothGrowth$dose),mean)
+        aggregate(ToothGrowth$len,list(ToothGrowth$supp,ToothGrowth$dose),sd)
+
+```
+
+2. Summary Data
+
+```{r}
+        summary(ToothGrowth)
+```
+
+3. Graphs & Hypothesis Testing
+
+Boxplot Tooth Length Vs. Dose
+
+```{r, echo=TRUE}
+            ggplot(ToothGrowth, aes(x = factor(dose), y = len, fill = factor(dose)))+
+                  geom_boxplot()+
+                  facet_grid(.~supp)+
+                  labs(title = "Tooth Length Vs. Dose  by for OJ & VC",
+                  x = "Doses", y = "Tooth Length")
+```
+
+Table View 
+
+```{r}
+            table(ToothGrowth$supp,ToothGrowth$dose)
+```
+
+Confidence Intervals / Hypothesis Tests - Comparison of Tooth Growth by Supp & Dose
+
+In accordance with the box plot, OJ appears better with a dose 0.5 and 1.0 effect on teeth growth than VC. To test this hypothesis by hold a the mean of OJ and VC does not cross zero.
+
+Dose 0.5
+
+We are 95% confident the limits of 1.719057 and 8.780943 contain the difference between the two population means.  The confidence interval suggests that it is possible that the two population means are not equal since the limits do not contain zero.
+
+```{r}
+            ojdose0.5 <- ToothGrowth %>% filter(supp=="OJ" & dose=="0.5")
+            vcdose0.5 <- ToothGrowth %>% filter(supp=="VC" & dose=="0.5")
+            t.test(ojdose0.5$len,vcdose0.5$len)
+```
+
+Dose 1.0
+
+We are 95% confident the limits of 2.802148 and 9.057852 contain the difference between the two population means. The confidence interval suggests that it is possible that the two population means are not equal since the limits do not contain zero.
+
+```{r}
+            ojdose1.0 <- ToothGrowth %>% filter(supp=="OJ" & dose=="1")
+            vcdose1.0 <- ToothGrowth %>% filter(supp=="VC" & dose=="1")
+            t.test(ojdose1.0$len,vcdose1.0$len)
+```
+
+Dose 2.0
+
+We are 95% confident the limits of -3.79807 and 3.63807 contain the difference between the two population means. The confodence interval suggests that it is possible that the two population means are equal since the limits contain zero.
+
+```{r}
+            ojdose2.0 <- ToothGrowth %>% filter(supp=="OJ" & dose=="2")
+            vcdose2.0 <- ToothGrowth %>% filter(supp=="VC" & dose=="2")
+            t.test(ojdose2.0$len,vcdose2.0$len)
+```
+
+4. Conclusions & Assumptions
+
+We are 95% confident the OJ doses of 0.5 and 1 result in longer tooth length than VC doses of 0.5 and 1. However, at the highest dose of 2.0, there is no statistically significant difference between the effects of OJ and VC. The null hypotheses that there is a relationship between the supplements and the length of the tooth has a p value of less then 5% (3%). The 5% interval is a rule of thumb used. This means we have to reject the null hypotheses and assume that there is a correlation.
